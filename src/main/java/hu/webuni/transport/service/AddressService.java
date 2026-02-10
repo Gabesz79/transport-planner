@@ -36,10 +36,25 @@ public class AddressService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 	
+	@Transactional
 	public Address save(Address address) {
+		//Végre kell hajtani a mező azonosság ellenőrzést POST esetén, és mező azonosság + id nem azonosság ellenörzést PUT esetén: 
+		if (address.getId() == null) {
+			//POST create eset:
+			if (addressRepository.existsByCountryAndZipAndCityAndStreetAndHouseNumber(address.getCountry(), address.getZip(), address.getCity(), address.getStreet(), address.getHouseNumber())) {
+				throw new ResponseStatusException(HttpStatus.CONFLICT, "Address already exists!");
+			}
+		}
+		//PUT update eset:
+		else {
+			if (addressRepository.existsByCountryAndZipAndCityAndStreetAndHouseNumberAndIdNot(address.getCountry(), address.getZip(), address.getCity(), address.getStreet(), address.getHouseNumber(), address.getId())) {
+				throw new ResponseStatusException(HttpStatus.CONFLICT, "Address already exists!");
+			}
+		}
 		return addressRepository.save(address);
 	}
 	
+	@Transactional
 	public void deleteById(Long id) {
 		addressRepository.deleteById(id);
 	}

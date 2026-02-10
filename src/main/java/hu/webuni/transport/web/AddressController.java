@@ -44,7 +44,7 @@ public class AddressController {
 	}
 	
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED) //új példány létrejötte
+	@ResponseStatus(HttpStatus.CREATED) //új példány létrejötte, ha oké, akkor 201-at ad vissza
 	public AddressDto create(@RequestBody @Valid AddressDto dto) {
 		Address saved = addressService.save(addressMapper.dtoToAddress(dto));
 		return addressMapper.addressToDto(saved);
@@ -57,7 +57,7 @@ public class AddressController {
 		Address address = addressMapper.dtoToAddress(dto);
 		address.setId(id);
 		Address saved = addressService.save(address);
-		return addressMapper.addressToDto(saved);
+		return addressMapper.addressToDto(saved); //ha oké, akkor 200-at ad vissza
 	}
 	
 	@DeleteMapping("/{id}")

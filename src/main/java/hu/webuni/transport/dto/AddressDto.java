@@ -1,14 +1,26 @@
 package hu.webuni.transport.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class AddressDto {
 
 	private Long id;
 	
+	@NotBlank
 	private String country;
+	
+	@NotBlank
 	private String zip;
+	
+	@NotBlank
 	private String city;
+	
+	@NotBlank
 	private String street;
+	
+	@NotBlank
 	private String houseNumber;
+	
 	public Long getId() {
 		return id;
 	}
