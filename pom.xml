@@ -76,7 +76,14 @@
         	<artifactId>mapstruct</artifactId>
         	<version>${org.mapstruct.version}</version>
     	</dependency>
-		
+    	
+    	<dependency>
+    		<groupId>org.hibernate</groupId>
+    		<artifactId>hibernate-jpamodelgen</artifactId>
+    		<version>7.2.3.Final</version>
+    		<type>pom</type>
+    		<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -96,6 +103,11 @@
                         	<version>${org.mapstruct.version}</version>
                     	</path>
                     	<!-- other annotation processors -->
+                    	<path>
+                    		<groupId>org.hibernate</groupId>
+    						<artifactId>hibernate-jpamodelgen</artifactId>
+    						<version>7.2.3.Final</version>
+    					</path>
                 	</annotationProcessorPaths>
             </configuration>
         </plugin>
