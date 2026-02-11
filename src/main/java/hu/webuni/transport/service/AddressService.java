@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import hu.webuni.transport.model.Address;
@@ -59,7 +60,30 @@ public class AddressService {
 		addressRepository.deleteById(id);
 	}
 	
-	public Page<Address> findAll(Specification<Address> spec, Pageable pageable) {
+//	public Page<Address> findAll(Specification<Address> spec, Pageable pageable) {
+//		return addressRepository.findAll(spec, pageable);
+//	}
+	
+	public Page<Address> search(String city, String zip, String street, String country, Pageable pageable) {
+		
+		Specification<Address> spec = (root, cq, cb) -> cb.conjunction(); //where(null) helyett
+		
+		if(StringUtils.hasText(city)) {
+			spec = spec.and(AddressSpecifications.hasCity(city));
+		}
+		
+		if(StringUtils.hasText(zip)) {
+			spec = spec.and(AddressSpecifications.hasZip(zip));
+		}
+		
+		if(StringUtils.hasText(street)) {
+			spec = spec.and(AddressSpecifications.hasStreet(street));
+		}
+		
+		if(StringUtils.hasText(country)) {
+			spec = spec.and(AddressSpecifications.hasCountry(country));
+		}
+		
 		return addressRepository.findAll(spec, pageable);
 	}
 	

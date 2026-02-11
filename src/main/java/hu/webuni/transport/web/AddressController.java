@@ -2,6 +2,7 @@ package hu.webuni.transport.web;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,9 +33,21 @@ public class AddressController {
 		this.addressMapper = addressMapper;
 	}
 	
+//	@GetMapping
+//	public List<AddressDto> getAll() {
+//		return addressService.findAll().stream()
+//				.map(addressMapper::addressToDto)
+//				.toList();
+//	}
+	
 	@GetMapping
-	public List<AddressDto> getAll() {
-		return addressService.findAll().stream()
+	public List<AddressDto> getAll(
+			@RequestParam(required = false) String city,
+			@RequestParam(required = false) String zip,
+			@RequestParam(required = false) String street,
+			@RequestParam(required = false) String country,
+			Pageable pageable) {
+		return addressService.search(city, zip, street, country, pageable).stream()
 				.map(addressMapper::addressToDto)
 				.toList();
 	}
