@@ -153,6 +153,171 @@
         "header": []
       },
       "response": []
+    },
+    {
+      "name": "Search Pageable /Specifications",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"country\": \"HU\",\r\n  \"zip\": \"1111\",\r\n  \"city\": \"Budapest\",\r\n  \"street\": \"Bartók Béla út\",\r\n  \"houseNumber\": \"1\"\r\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/addresses?page=0&size=2&sort=city,asc",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "addresses"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "2"
+            },
+            {
+              "key": "sort",
+              "value": "city,asc"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search Pageable /Specifications 2",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "TransportPlans GetAll",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \r\n    \"plannedStart\": \"2026-02-11T10:00:00\",\r\n    \"plannedEnd\": \"2026-02-11T18:00:00\",\r\n    \"expectedRevenue\": 100000, \r\n    \"stops\": \r\n    [ \r\n        {\r\n            \"stopOrder\": 1, \r\n            \"plannedArrival\": \"2026-02-11T10:30:00\",\r\n            \"plannedDeparture\": \"2026-02-11T11:00:00\",\r\n            \"addressId\": 1 \r\n        } \r\n    ] \r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transport-plans",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transport-plans"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TransportPlans Create 404",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"plannedStart\": \"2026-02-11T10:00:00\",\r\n  \"plannedEnd\": \"2026-02-11T18:00:00\",\r\n  \"expectedRevenue\": 100000,\r\n  \"stops\": [\r\n    {\r\n      \"stopOrder\": 1,\r\n      \"plannedArrival\": \"2026-02-11T10:30:00\",\r\n      \"plannedDeparture\": \"2026-02-11T11:00:00\",\r\n      \"addressId\": 2\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transport-plans",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transport-plans"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TransportPlans Create 400",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"plannedStart\": \"2026-02-11T10:00:00\",\r\n  \"plannedEnd\": \"2026-02-11T18:00:00\",\r\n  \"expectedRevenue\": 100000,\r\n  \"stops\": [\r\n    {\r\n      \"stopOrder\": 1,\r\n      \"plannedArrival\": \"2026-02-11T10:30:00\",\r\n      \"plannedDeparture\": \"2026-02-11T11:00:00\"\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transport-plans",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transport-plans"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TransportPlans Create 201 Created",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \r\n    \"plannedStart\": \"2026-02-11T10:00:00\",\r\n    \"plannedEnd\": \"2026-02-11T18:00:00\",\r\n    \"expectedRevenue\": 100000, \r\n    \"stops\": \r\n    [ \r\n        {\r\n            \"stopOrder\": 1, \r\n            \"plannedArrival\": \"2026-02-11T10:30:00\",\r\n            \"plannedDeparture\": \"2026-02-11T11:00:00\",\r\n            \"addressId\": 1 \r\n        } \r\n    ] \r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transport-plans",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transport-plans"
+          ]
+        }
+      },
+      "response": []
     }
   ]
 }
