@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,7 +26,7 @@ public class TransportPlan {
 	
 	private Long ownerUserId;
 	
-	@OneToMany(mappedBy = "transportPlan") //One TransportPlan -> Many TransportStops
+	@OneToMany(mappedBy = "transportPlan", cascade = CascadeType.ALL) //One TransportPlan -> Many TransportStops
 	@OrderBy("stopOrder ASC")
 	private List<TransportStop> stops = new ArrayList<>();
 
