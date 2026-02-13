@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import hu.webuni.transport.dto.DelayRequestDto;
 import hu.webuni.transport.dto.TransportPlanDto;
 import hu.webuni.transport.dto.TransportPlanSummaryDto;
 import hu.webuni.transport.mapper.TransportPlanMapper;
@@ -97,6 +97,12 @@ public class TransportPlanController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Long id) {
 		transportPlanService.delete(id);
+	}
+	
+	@PostMapping("/{id}/delay")
+	public TransportPlanDto delay(@PathVariable Long id, @RequestBody DelayRequestDto delayRequestDto) {
+		TransportPlan delayedObject = transportPlanService.delay(id, delayRequestDto.getMinutes());
+		return transportPlanMapper.planToDto(delayedObject);
 	}
 	
 	

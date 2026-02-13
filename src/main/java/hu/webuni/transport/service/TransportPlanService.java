@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.h2.table.Plan;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +19,11 @@ import hu.webuni.transport.repository.TransportPlanRepository;
 @Service
 public class TransportPlanService {
 
+	@Value("${transport.delay.revenueReductionPercent}")
+	private Integer revenueReductionPercent;
+	
 	private final TransportPlanRepository transportPlanRepository;
-	private final AddressRepository addressRepository; 
+	private final AddressRepository addressRepository;
 
 	public TransportPlanService(TransportPlanRepository transportPlanRepository, AddressRepository addressRepository) {
 		this.transportPlanRepository = transportPlanRepository;
@@ -127,6 +132,37 @@ public class TransportPlanService {
 		}
 	}
 	
-	
-
+	@Transactional
+	public TransportPlan delay(Long id, Integer minutes) {
+		TransportPlan transportPlan = transportPlanRepository.findByIdWithStops(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transport plan not found: " + id));
+		
+		if (transportPlan.getPlannedStart() != null) {
+			transportPlan.setPlannedStart(transportPlan.getPlannedStart().plusMinutes(minutes));
+		}
+		
+		if (transportPlan.getPlannedEnd() != null) {
+			transportPlan.setPlannedEnd(transportPlan.getPlannedEnd().plusMinutes(minutes));
+		}
+		
+		if (transportPlan.getStops() != null) {
+			for (TransportStop stop : transportPlan.getStops()) {
+				if (stop.getPlannedArrival() != null) {
+					stop.setPlannedArrival(stop.getPlannedArrival().plusMinutes(minutes));
+				}
+				
+				if (stop.getPlannedDeparture() != null) {
+					stop.setPlannedDeparture(stop.getPlannedDeparture().plusMinutes(minutes));
+				}
+			}
+		}
+		
+		//Késés esetén bevétel csökkentés is legyen:
+		if (minutes > 0) {
+			Integer newRevenue = transportPlan.getExpectedRevenue() * (100 - revenueReductionPercent) /100;
+			transportPlan.setExpectedRevenue(newRevenue);
+		}
+		
+		return transportPlan;
+	}
 }
