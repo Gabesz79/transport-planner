@@ -25,6 +25,27 @@ public class TransportPlanService {
 		this.addressRepository = addressRepository;
 	}
 	
+	@Transactional(readOnly = true)
+	public List<TransportPlan> findAll(Boolean full) {
+		return full ? transportPlanRepository.findAllWithStops() 
+				: transportPlanRepository.findAll();
+	}
+	
+	@Transactional(readOnly = true)
+	public List<TransportPlan> findAllFullWithAddresses() {
+		return transportPlanRepository.findAllWithStopsAndAddresses();
+	}
+	
+	@Transactional(readOnly = true)
+	public TransportPlan findById(Long id, Boolean full) {
+		if(full) {
+			return transportPlanRepository.findByIdWithStops(id)
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TransportPlan not found: " + id));
+		}
+		return transportPlanRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TransportPlan not found: " + id));
+	}
+	
 	@Transactional
 	public TransportPlan save(TransportPlan plan) {
 		//StopOrder validálása: sorszáma csak egyszer szerepelhet a TransportPlan-ben:
@@ -106,21 +127,6 @@ public class TransportPlanService {
 		}
 	}
 	
-	@Transactional(readOnly = true)
-	public List<TransportPlan> findAll(Boolean full) {
-		return full ? transportPlanRepository.findAllWithStops() 
-				: transportPlanRepository.findAll();
-	}
-	
-	@Transactional(readOnly = true)
-	public TransportPlan findById(Long id, Boolean full) {
-		if(full) {
-			return transportPlanRepository.findByIdWithStops(id)
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TransportPlan not found: " + id));
-		}
-		return transportPlanRepository.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TransportPlan not found: " + id));
-	}
 	
 
 }

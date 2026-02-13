@@ -2,6 +2,9 @@ package hu.webuni.transport.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL) //Az address objektum miatt vezettem be, hogy ha azt nem kérdezem le külön metódussal, akkor ne jelenjen meg. Magyarul csak azt írja ki, ami nem null   
 public class TransportStopDto {
 
 	private Long id;
@@ -19,6 +22,8 @@ public class TransportStopDto {
 	//és nem kell Address-ből a TransportStop listát (stops) visszahívni, vagyis nincs szükségem arra, hogy a cím melyik stop-okban szerepel, és azon keresztül hogy melyik tervben szerepel nem kell 
 	//full paraméternél a teljes address kiiratást az AddressDto-val oldom meg
 	private Long addressId;
+	
+	private AddressDto address;
 
 	public Long getId() {
 		return id;
@@ -67,5 +72,15 @@ public class TransportStopDto {
 	public void setAddressId(Long addressId) {
 		this.addressId = addressId;
 	}
+
+	public AddressDto getAddress() {
+		return address;
+	}
+
+	public void setAddress(AddressDto address) {
+		this.address = address;
+	}
+	
+	
 	
 }

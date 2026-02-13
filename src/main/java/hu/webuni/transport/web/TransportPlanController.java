@@ -64,6 +64,11 @@ public class TransportPlanController {
 		return transportPlanMapper.plansToDtos(transportPlanService.findAll(true));
 	}
 	
+	@GetMapping(params = {"full=true", "includeAddress=true"})
+	public List<TransportPlanDto> getAllFullWithAddresses() {
+		return transportPlanMapper.plansToDtosWithAddress(transportPlanService.findAllFullWithAddresses());
+	}
+	
 	//Egyértelmű elválasztás id lekérdezés esetén is (számomra jobban átlátható így a kód, mint a Mapper-ben való külön beállítás, ezért választottam ezt a megoldást):
 	@GetMapping("/{id}")
 	public TransportPlanSummaryDto getByIdSummary(@PathVariable Long id) {

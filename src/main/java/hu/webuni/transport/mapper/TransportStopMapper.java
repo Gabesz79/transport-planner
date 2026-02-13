@@ -2,16 +2,24 @@ package hu.webuni.transport.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import hu.webuni.transport.dto.TransportStopDto;
 import hu.webuni.transport.model.TransportStop;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = AddressMapper.class)
 public interface TransportStopMapper {
 
+	@Named("stopNoAddress")
 	@Mapping(source = "transportPlan.id", target = "transportPlanId")
 	@Mapping(source = "address.id", target = "addressId")
+	@Mapping(target = "address", ignore = true) //includeAddress nélkül ne legyen benne
 	TransportStopDto stopToDto(TransportStop transportStop);
+	
+	@Named("stopWithAddress")
+	@Mapping(source = "transportPlan.id", target = "transportPlanId")
+	@Mapping(source = "address.id", target = "addressId")
+	TransportStopDto stopToDtoWithAddress(TransportStop transportStop);
 	
 	//csak alapmezők map-pelése, az address-t a Service állítja be az addressId alapján 
 	//(ha létezik az addressId), ha az addressId nem létezik, akkor 404 hiba dobás
