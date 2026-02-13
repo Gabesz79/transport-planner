@@ -1,6 +1,7 @@
 package hu.webuni.transport.service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,6 @@ import hu.webuni.transport.model.TransportPlan;
 import hu.webuni.transport.model.TransportStop;
 import hu.webuni.transport.repository.AddressRepository;
 import hu.webuni.transport.repository.TransportPlanRepository;
-import jakarta.persistence.CascadeType;
 
 @Service
 public class TransportPlanService {
@@ -84,4 +84,22 @@ public class TransportPlanService {
 			}
 		}
 	}
+	
+	@Transactional(readOnly = true)
+	public List<TransportPlan> findAll(Boolean full) {
+		return full ? transportPlanRepository.findAllWithStops() 
+				: transportPlanRepository.findAll();
+	}
+	
+	@Transactional(readOnly = true)
+	public TransportPlan findById(Long id, Boolean full) {
+		if(full) {
+			return transportPlanRepository.findByIdWithStops(id)
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TransportPlan not found: " + id));
+		}
+		return transportPlanRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TransportPlan not found: " + id));
+	}
+	
+
 }
