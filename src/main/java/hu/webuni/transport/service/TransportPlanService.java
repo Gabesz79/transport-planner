@@ -65,6 +65,27 @@ public class TransportPlanService {
 		//", cascade = CascadeType.ALL" és a saveAndFlush
 		return transportPlanRepository.saveAndFlush(plan);
 	}
+	
+	@Transactional
+	public TransportPlan update(Long id, TransportPlan plan) {
+		TransportPlan existing = transportPlanRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transport plan not found: " + id));
+		
+		plan.setId(id);
+		//TransportPlan felhasználó átadása fontos 
+		//Security - felhasználó itt már nem változtatható, és nem adható át még véletlenül sem null érték, ezért itt kell lekezelni:
+		plan.setOwnerUserId(existing.getOwnerUserId());
+		
+		return save(plan);
+	}
+	
+	@Transactional
+	public void delete(Long id) {
+		if (!transportPlanRepository.existsById(id)) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transport plan not found: " + id);
+		}
+		transportPlanRepository.deleteById(id);
+	}
 
 	private void validateUniqueStopOrder(TransportPlan plan) {
 		
