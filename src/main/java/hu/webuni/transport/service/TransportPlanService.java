@@ -134,6 +134,15 @@ public class TransportPlanService {
 	
 	@Transactional
 	public TransportPlan delay(Long id, Integer minutes) {
+		
+		//400-as hibakezelés tesztben:
+		if (minutes == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minutes is required");
+		}
+		if (minutes <= 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minutes must be positive");
+		}
+		
 		TransportPlan transportPlan = transportPlanRepository.findByIdWithStops(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transport plan not found: " + id));
 		
@@ -158,7 +167,7 @@ public class TransportPlanService {
 		}
 		
 		//Késés esetén bevétel csökkentés is legyen:
-		if (minutes > 0) {
+		if (transportPlan.getExpectedRevenue() != null) {
 			Integer newRevenue = transportPlan.getExpectedRevenue() * (100 - revenueReductionPercent) /100;
 			transportPlan.setExpectedRevenue(newRevenue);
 		}

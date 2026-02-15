@@ -65,17 +65,5 @@ public class Address {
 	public void setHouseNumber(String houseNumber) {
 		this.houseNumber = houseNumber;
 	}
-
-	public Address(String country, String zip, String city, String street, String houseNumber) {
-		super();
-		this.country = country;
-		this.zip = zip;
-		this.city = city;
-		this.street = street;
-		this.houseNumber = houseNumber;
-	}
 	
-	public Address() {
-		
-	}
 }

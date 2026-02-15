@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import hu.webuni.transport.model.TransportStop;
+
 public class TransportPlanDto {
 
 	Long id;
@@ -55,7 +57,4 @@ public class TransportPlanDto {
 		this.stops = stops;
 	}
 
-	
-	
-	
 }

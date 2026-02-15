@@ -78,6 +78,4 @@ public class TransportPlan {
 		this.stops = stops;
 	}
 	
-	
-	
 }

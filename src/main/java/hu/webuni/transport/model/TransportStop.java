@@ -85,6 +85,4 @@ public class TransportStop {
 		this.address = address;
 	}
 	
-	
-	
 }
