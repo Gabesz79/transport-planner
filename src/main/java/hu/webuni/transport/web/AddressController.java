@@ -2,8 +2,10 @@ package hu.webuni.transport.web;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import hu.webuni.transport.dto.AddressDto;
+import hu.webuni.transport.dto.AddressFilterDto;
 import hu.webuni.transport.mapper.AddressMapper;
 import hu.webuni.transport.model.Address;
 import hu.webuni.transport.service.AddressService;
@@ -40,16 +43,35 @@ public class AddressController {
 //				.toList();
 //	}
 	
-	@GetMapping
-	public List<AddressDto> getAll(
-			@RequestParam(required = false) String city,
-			@RequestParam(required = false) String zip,
-			@RequestParam(required = false) String street,
-			@RequestParam(required = false) String country,
-			Pageable pageable) {
-		return addressService.search(city, zip, street, country, pageable).stream()
-				.map(addressMapper::addressToDto)
-				.toList();
+//	@GetMapping
+//	public List<AddressDto> getAll(
+//			@RequestParam(required = false) String city,
+//			@RequestParam(required = false) String zip,
+//			@RequestParam(required = false) String street,
+//			@RequestParam(required = false) String country,
+//			Pageable pageable) {
+//		return addressService.search(city, zip, street, country, pageable).stream()
+//				.map(addressMapper::addressToDto)
+//				.toList();
+//	}
+	
+	@PostMapping("/search")
+	public ResponseEntity<List<AddressDto>> search(@RequestBody AddressFilterDto filter, Pageable pageable) {
+		//filter body-ban jön be, és pageable:
+		Page<Address> page = addressService.search(filter.getCity(), filter.getZip(), filter.getStreet(), filter.getCountry(), pageable);
+		
+		//Így is meg lehet oldani:
+//		List<AddressDto> dtos = page.getContent().stream()
+//				.map(addressMapper::addressToDto)
+//				.toList();
+		
+		//De felvettem az addressMapper-ben az addressesToDtos-t:
+		List<AddressDto> dtos = addressMapper.addressesToDtos(page.getContent());
+		
+		
+		return ResponseEntity.ok()
+				.header("X-Total-Count", String.valueOf(page.getTotalElements()))
+				.body(dtos);
 	}
 	
 	@GetMapping("/{id}")
