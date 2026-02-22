@@ -14,7 +14,7 @@ public class AddressSpecifications {
 		//Address rekordokat adja vissza találatnak a DB-ből, amelynek city mezői tartalmazzák a 
 		//keresőszót (bármi lehet előtte és utána is)
 		//Részleges egyezőség a keresésben case-insenitive módon:
-		return (root, cq, cb) -> cb.like(cb.lower(root.get(Address_.city)), "%" + city.toLowerCase() + "%");
+		return (root, cq, cb) -> cb.like(cb.lower(root.get(Address_.city)), (city + "%").toLowerCase() + "%");
 	}
 	
 	public static Specification<Address> hasZip(String zip) {
@@ -24,7 +24,7 @@ public class AddressSpecifications {
 	
 	public static Specification<Address> hasStreet(String street) {
 		//Részleges egyezőség a keresésben case-insenitive módon:
-		return (root, cq, cb) -> cb.like(cb.lower(root.get(Address_.street)), "%" + street.toLowerCase() + "%");
+		return (root, cq, cb) -> cb.like(cb.lower(root.get(Address_.street)), (street + "%").toLowerCase() + "%");
 	}
 	
 	public static Specification<Address> hasCountry(String country) {

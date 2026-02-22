@@ -1,5 +1,7 @@
 package hu.webuni.transport.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 
 import hu.webuni.transport.dto.AddressDto;
@@ -11,5 +13,9 @@ public interface AddressMapper {
 	AddressDto addressToDto(Address address);
 	
 	Address dtoToAddress(AddressDto addressDto);
+	
+	List<AddressDto> addressesToDtos(List<Address> addresses);
+	
+
 	
 }
