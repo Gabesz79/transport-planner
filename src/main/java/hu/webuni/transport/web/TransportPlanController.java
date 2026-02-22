@@ -21,7 +21,7 @@ import hu.webuni.transport.model.TransportPlan;
 import hu.webuni.transport.service.TransportPlanService;
 
 @RestController
-@RequestMapping("/api/transport-plans")
+@RequestMapping("/api/transportplans")
 public class TransportPlanController {
 	
 	private final TransportPlanService transportPlanService;
@@ -100,10 +100,18 @@ public class TransportPlanController {
 	}
 	
 	@PostMapping("/{id}/delay")
-	public TransportPlanDto delay(@PathVariable Long id, @RequestBody DelayRequestDto delayRequestDto) {
-		TransportPlan delayedObject = transportPlanService.delay(id, delayRequestDto.getMinutes());
-		return transportPlanMapper.planToDto(delayedObject);
+	public TransportPlanSummaryDto delay(@PathVariable Long id, @RequestBody DelayRequestDto delayRequestDto) {
+		TransportPlan delayedObject = transportPlanService.delay(id, delayRequestDto.getMilestoneId(), delayRequestDto.getMinutes());
+		return transportPlanMapper.planToSummaryDto(delayedObject);
+		
 	}
+
+	
+//	@PostMapping("/{id}/delay")
+//	public TransportPlanDto delay(@PathVariable Long id, @RequestBody DelayRequestDto delayRequestDto) {
+//		TransportPlan delayedObject = transportPlanService.delay(id, delayRequestDto.getMilestoneId(), delayRequestDto.getMinutes());
+//		return transportPlanMapper.planToDto(delayedObject);
+//	}
 	
 	
 }

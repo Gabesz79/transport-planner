@@ -16,6 +16,8 @@ public class TransportPlanDto {
 	private Integer expectedRevenue;
 	
 	private List<TransportStopDto> stops = new ArrayList<>();
+	
+	private List<SectionDto> sections;
 
 	public Long getId() {
 		return id;
@@ -56,5 +58,14 @@ public class TransportPlanDto {
 	public void setStops(List<TransportStopDto> stops) {
 		this.stops = stops;
 	}
+
+	public List<SectionDto> getSections() {
+		return sections;
+	}
+
+	public void setSections(List<SectionDto> sections) {
+		this.sections = sections;
+	}
+	
 
 }

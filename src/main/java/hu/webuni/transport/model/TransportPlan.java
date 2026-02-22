@@ -29,6 +29,11 @@ public class TransportPlan {
 	@OneToMany(mappedBy = "transportPlan", cascade = CascadeType.ALL) //One TransportPlan -> Many TransportStops
 	@OrderBy("stopOrder ASC")
 	private List<TransportStop> stops = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "transportPlan", cascade = CascadeType.ALL) //One TransportPlan -> Many Sections
+	@OrderBy("sectionOrder ASC")
+	private List<Section> sections = new ArrayList<>();
+	
 
 	public Long getId() {
 		return id;
@@ -76,6 +81,14 @@ public class TransportPlan {
 
 	public void setStops(List<TransportStop> stops) {
 		this.stops = stops;
+	}
+	
+	public List<Section> getSections() {
+		return sections;
+	}
+
+	public void setSections(List<Section> sections) {
+		this.sections = sections;
 	}
 	
 }
