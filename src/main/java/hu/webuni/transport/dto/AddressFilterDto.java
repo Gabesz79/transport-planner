@@ -1,6 +1,5 @@
 package hu.webuni.transport.dto;
 
-import jakarta.validation.constraints.NotBlank;
 
 public class AddressFilterDto {
 

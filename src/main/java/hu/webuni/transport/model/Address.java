@@ -19,6 +19,7 @@ public class Address {
 	private String houseNumber;
 	private Double latitude;
 	private Double longitude;
+	
 
 	public Long getId() {
 		return id;
