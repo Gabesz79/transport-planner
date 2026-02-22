@@ -5,22 +5,39 @@ import java.util.List;
 import java.util.Set;
 
 import org.h2.table.Plan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import hu.webuni.transport.config.DelayProperties;
+import hu.webuni.transport.model.Milestone;
+import hu.webuni.transport.model.Section;
 import hu.webuni.transport.model.TransportPlan;
 import hu.webuni.transport.model.TransportStop;
 import hu.webuni.transport.repository.AddressRepository;
+import hu.webuni.transport.repository.MilestoneRepository;
+import hu.webuni.transport.repository.SectionRepository;
 import hu.webuni.transport.repository.TransportPlanRepository;
 
 @Service
 public class TransportPlanService {
 
-	@Value("${transport.delay.revenueReductionPercent}")
-	private Integer revenueReductionPercent;
+//	@Value("${transport.delay.revenueReductionPercent}")
+//	private Integer revenueReductionPercent;
+	
+	@Autowired
+	private DelayProperties delayProperties;
+	
+	@Autowired
+	private SectionRepository sectionRepository;
+	
+	@Autowired
+	MilestoneRepository milestoneRepository;
+	
+	private Integer revenueReductionPercent = 30;
 	
 	private final TransportPlanRepository transportPlanRepository;
 	private final AddressRepository addressRepository;
@@ -133,45 +150,132 @@ public class TransportPlanService {
 	}
 	
 	@Transactional
-	public TransportPlan delay(Long id, Integer minutes) {
+	public TransportPlan delay(Long planId, Long milestoneId, Integer minutes) {
 		
-		//400-as hibakezelés tesztben:
-		if (minutes == null) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minutes is required");
-		}
 		if (minutes <= 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minutes must be positive");
 		}
 		
-		TransportPlan transportPlan = transportPlanRepository.findByIdWithStops(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transport plan not found: " + id));
+		//2 hibakeresés:
+		//létezik-e a transportPlan id alapján az objektum:
+		TransportPlan plan = transportPlanRepository.findById(planId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TransportPlan not found: " + planId));
+		//létezik-e a milestone id alapján az objektum:
+		Milestone milestone = milestoneRepository.findById(milestoneId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Milestone not found: " + milestoneId));
 		
-		if (transportPlan.getPlannedStart() != null) {
-			transportPlan.setPlannedStart(transportPlan.getPlannedStart().plusMinutes(minutes));
+		//Ellenőrzöm, hogy adott TarnsportPlan section-einek Milestone része-e: 
+		//beteszem egy listába a transportPlan összes section-jét):
+		List<Section> sections = sectionRepository.findByTransportPlanIdOrderBySectionOrderAsc(planId);
+		
+		boolean milestoneInPlan = false;
+		
+		//Mindig hozzáadom a kését a milestone-hoz:
+		if (milestone.getPlannedTime() != null) {
+			milestone.setPlannedTime(milestone.getPlannedTime().plusMinutes(minutes));
 		}
 		
-		if (transportPlan.getPlannedEnd() != null) {
-			transportPlan.setPlannedEnd(transportPlan.getPlannedEnd().plusMinutes(minutes));
-		}
-		
-		if (transportPlan.getStops() != null) {
-			for (TransportStop stop : transportPlan.getStops()) {
-				if (stop.getPlannedArrival() != null) {
-					stop.setPlannedArrival(stop.getPlannedArrival().plusMinutes(minutes));
+		//For ciklussal megnézem, hogy benne van-e adott milestone adott TransportPlan section-ei között:
+		for (int i=0; i<sections.size(); i++) {
+			Section s = sections.get(i);
+			
+			//Ellenőrzöm adott section kezdő- és végállomását, hogy adott milestone-nal azonos-e...
+			boolean isStart = s.getFromMilestone() != null && s.getFromMilestone().getId().equals(milestoneId);
+			boolean isEnd = s.getToMilestone() != null && s.getToMilestone().getId().equals(milestoneId);
+			
+			//...Ha azonos az egyik állomással, akkor benne van TransportPlan-ben a megálló (milestone):
+			if (isStart || isEnd) {
+				milestoneInPlan = true;
+			}
+			
+			//Ha ez a milestone kezdőállomás, akkor a section végállomásának idejáét is növelni kell adott minutes-el:
+			if (isStart) {
+				Milestone end = s.getToMilestone();
+				if (end != null && end.getPlannedTime() != null && !end.getId().equals(milestoneId)) {
+					end.setPlannedTime(end.getPlannedTime().plusMinutes(minutes));
 				}
-				
-				if (stop.getPlannedDeparture() != null) {
-					stop.setPlannedDeparture(stop.getPlannedDeparture().plusMinutes(minutes));
+			}
+			
+			//Ha ez a milestone egy section befejező milestone-ja, akkor a következő section 
+			//kezdő milestone-ját kell növelni (ha az nem ugyanaz a milestone, mint az azt megelőzőbefejező milestone):
+			if (isEnd) {
+				Section next = (i + 1 < sections.size()) ? sections.get(i+1) : null;
+				if (next != null) {
+					Milestone nextStart = next.getFromMilestone();
+					
+					if (nextStart != null && nextStart.getPlannedTime() != null && !nextStart.getId().equals(milestoneId)) {
+						nextStart.setPlannedTime(nextStart.getPlannedTime().plusMinutes(minutes));
+					}
 				}
 			}
 		}
 		
-		//Késés esetén bevétel csökkentés is legyen:
-		if (transportPlan.getExpectedRevenue() != null) {
-			Integer newRevenue = transportPlan.getExpectedRevenue() * (100 - revenueReductionPercent) /100;
-			transportPlan.setExpectedRevenue(newRevenue);
+		//Ha adott TransportPlan egyetlen section-ében sincs benne adott mileStone, akkor eldobás
+		if (!milestoneInPlan) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Milestone " + milestoneId + " is not part of transport plan" + planId); 
 		}
 		
-		return transportPlan;
+		//Bevétel csökkentés (30/60/120 perces küszöb, properties-ből kiolvasva)
+		Integer percent = 0;
+		if (minutes >= 120) {
+			percent = delayProperties.getRevenueReductionPercent120();
+		}
+		else if (minutes >= 60) {
+			percent = delayProperties.getRevenueReductionPercent60();
+		}
+		else if (minutes >= 30) {
+			percent = delayProperties.getRevenueReductionPercent30();
+		}
+		
+		//Ha a % nagyobb mint nulla, akkor az előbb kiszámolt %-al elvégezzük 
+		//az új csökkentett bevétel számítását: 
+		if (plan.getExpectedRevenue() != null && percent > 0) {
+			int newRevenue = plan.getExpectedRevenue() * (100 - percent) /100;
+			plan.setExpectedRevenue(newRevenue);
+		}
+		
+		return transportPlanRepository.save(plan);
+		
+		//Előző sáv nélküli változat számítás: 
+		//400-as hibakezelés tesztben:
+//		if (minutes == null) {
+//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minutes is required");
+//		}
+//		
+//		if (minutes <= 0) {
+//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minutes must be positive");
+//		}
+//		
+//		TransportPlan transportPlan = transportPlanRepository.findByIdWithStops(id)
+//				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transport plan not found: " + id));
+//		
+//		if (transportPlan.getPlannedStart() != null) {
+//			transportPlan.setPlannedStart(transportPlan.getPlannedStart().plusMinutes(minutes));
+//		}
+//		
+//		if (transportPlan.getPlannedEnd() != null) {
+//			transportPlan.setPlannedEnd(transportPlan.getPlannedEnd().plusMinutes(minutes));
+//		}
+//		
+//		if (transportPlan.getStops() != null) {
+//			for (TransportStop stop : transportPlan.getStops()) {
+//				if (stop.getPlannedArrival() != null) {
+//					stop.setPlannedArrival(stop.getPlannedArrival().plusMinutes(minutes));
+//				}
+//				
+//				if (stop.getPlannedDeparture() != null) {
+//					stop.setPlannedDeparture(stop.getPlannedDeparture().plusMinutes(minutes));
+//				}
+//			}
+//		}
+//		
+//		//Késés esetén bevétel csökkentés is legyen:
+//		if (transportPlan.getExpectedRevenue() != null) {
+//			Integer newRevenue = transportPlan.getExpectedRevenue() * (100 - revenueReductionPercent) /100;
+//			transportPlan.setExpectedRevenue(newRevenue);
+//		}
+//		
+//		return transportPlan;
+		
 	}
 }

@@ -17,17 +17,24 @@ import hu.webuni.transport.model.TransportStop;
 //TransportPlan-hez tartozó List<TransportStop> stops-ot (Entity-t) is 
 //List<TransportStopDto> stops-ra (Dto-ra) kell átalakítani, 
 //ezért stops lista map-peléséhez a uses = TransportStopMapper.class-re van szükség!
-@Mapper(componentModel = "spring", uses = TransportStopMapper.class)
+@Mapper(componentModel = "spring", uses = {TransportStopMapper.class, SectionMapper.class})
 public interface TransportPlanMapper {
 
-	//TransportPlan - Full (stops, de address nélkül)
+//	//TransportPlan - Full (stops, de address nélkül)
+//	@Named("planNoAddress")
+//	@Mapping(target = "stops", qualifiedByName = "stopsToDtosNoAddress")
+	
+	//TransportPlan - Full (sections, de address nélkül)
 	@Named("planNoAddress")
-	@Mapping(target = "stops", qualifiedByName = "stopsToDtosNoAddress")
 	TransportPlanDto planToDto(TransportPlan transportPlan);
 	
-	//TransportPlan - Full + includeAddress (stops + address részletezve)
+//	//TransportPlan - Full + includeAddress (stops + address részletezve)
+//	@Named("planWithAddress")
+//	@Mapping(target = "stops", qualifiedByName = "stopsToDtosWithAddress")
+//	TransportPlanDto planToDtoWithAddress(TransportPlan transportPlan);
+	
+	//TransportPlan - Full + includeAddress (sections + address részletezve)
 	@Named("planWithAddress")
-	@Mapping(target = "stops", qualifiedByName = "stopsToDtosWithAddress")
 	TransportPlanDto planToDtoWithAddress(TransportPlan transportPlan);
 	
 	//Amíg nem írom meg a Security-t, addig ignorálom az ownerUserId mező küldését:
@@ -38,7 +45,7 @@ public interface TransportPlanMapper {
 	@Named("summary")
 	TransportPlanSummaryDto planToSummaryDto(TransportPlan transportPlan);
 	
-	//Summary:
+	//Summary lista:
 	List<TransportPlanSummaryDto> plansToSummaryDtos(List<TransportPlan> transportPlans);
 	
 	//TransportPlan - Full lista - Address nélkül
