@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
@@ -65,8 +67,13 @@ public class TransportPlanDelayTeacherIT {
 	// - ha a milestone egy section START-ja -> a section END milestone-ja is tolódik
 	// - ha a milestone egy section END-je -> a következő section START-ja tolódik
 	// - revenue csökkentés: 30/60/120 perc küszöb szerint properties-ből (feltételezzük: 30 -> 10%, 60 -> 20%, 120 -> 30%)
-	@Test
-	void delay_shouldShiftTimes_andReduceRevenue_milestoneBasedRules() {
+	//@Test
+	@ParameterizedTest
+	@CsvSource({
+		"1000, 900",
+		"1, 1"
+	})
+	void delay_shouldShiftTimes_andReduceRevenue_milestoneBasedRules(int startRevenue, int expectedRevenue) {
 		Address address1 = saveAddress("Hungary", "Budapest", "1138", "Váci út", "91");
 		Address address2 = saveAddress("Hungary", "Budapest", "1037", "Bécsi út", "12");
 		Address address3 = saveAddress("Hungary", "Budapest", "1042", "Árpád út", "56");
@@ -81,7 +88,16 @@ public class TransportPlanDelayTeacherIT {
 		
 		//TransportPlan + expectedRevenue:
 		TransportPlan plan = new TransportPlan();
-		plan.setExpectedRevenue(1000); //30 perc késés esetén (10%) -> eredmény: 900
+		
+		//1. eset:
+		//plan.setExpectedRevenue(1000); //30 perc késés esetén (10%) -> eredmény: 900
+		
+//		//2. eset:
+//		plan.setExpectedRevenue(1); //30 perc késés esetén (10%) -> eredmény: 1
+		
+		//Mindkét teszteset futtatása:
+		plan.setExpectedRevenue(startRevenue);
+		
 		plan = transportPlanRepository.save(plan);
 		
 		//Sections létrehozása:
@@ -129,8 +145,14 @@ public class TransportPlanDelayTeacherIT {
 		//A nem éritett, nem változik:
 		assertEquals(time1, milestoneA2.getPlannedTime());
 		
-		//Bevétel: 30 perc esetén 10 % csökkenés: 1000 -> 900:
-		assertEquals(900, plan2.getExpectedRevenue());
+//		//1. eset: Bevétel: 30 perc esetén 10 % csökkenés: 1000 -> 900:
+//		assertEquals(900, plan2.getExpectedRevenue());
+		
+//		//2. eset Bevétel: 30 perc esetén 10 % csökkenés: 1 -> 1:
+//		assertEquals(1, plan2.getExpectedRevenue());
+		
+		//Mindkét teszteset futtatása:
+		assertEquals(expectedRevenue, plan2.getExpectedRevenue());
 		
 	}
 	
