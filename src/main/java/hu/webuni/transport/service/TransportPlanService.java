@@ -278,7 +278,8 @@ public class TransportPlanService {
 		//Ha a % nagyobb mint nulla, akkor az előbb kiszámolt %-al elvégezzük 
 		//az új csökkentett bevétel számítását: 
 		if (plan.getExpectedRevenue() != null && percent > 0) {
-			int newRevenue = plan.getExpectedRevenue() * (100 - percent) /100;
+			
+			int newRevenue = (int)Math.round(plan.getExpectedRevenue() * (100.0 - percent) /100.0);
 			plan.setExpectedRevenue(newRevenue);
 		}
 		
