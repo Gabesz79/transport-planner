@@ -1,51 +1,29 @@
 {
   "info": {
-    "_postman_id": "062a3188-d1cb-4700-8c3b-81d7e484689b",
-    "name": "ZV feladat - webuni - Spring Boot Java alap 1.",
+    "_postman_id": "abf1edbc-6e6c-4f6a-ab80-083d17991e85",
+    "name": "ZV feladat spec - webuni - Spring Boot Java alap 1.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "41009882"
   },
   "item": [
     {
-      "name": "Address getAll",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
+      "name": "Create Address",
       "request": {
-        "method": "GET",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZGRyZXNzbWdyIiwiYXV0aCI6WyJBRERSRVNTX01BTkFHRVIiXSwiaWF0IjoxNzcxODkxMTE0LCJleHAiOjE3NzE4OTE3MTQsImlzcyI6InRyYW5zcG9ydCJ9.ea3jnqbrQ03gv4K9XFcrxTCXieXiCsLVy4_Y3oHapHs",
+              "type": "string"
             }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8080/api/addresses",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "addresses"
           ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Address Create",
-      "request": {
+        },
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"country\": \"HU\",\r\n  \"zip\": \"1111\",\r\n  \"city\": \"Budapest\",\r\n  \"street\": \"Bartók Béla út\",\r\n  \"houseNumber\": \"1\"\r\n}",
+          "raw": "{ \r\n    \"country\": \"Hungary\", \r\n    \"city\": \"Budapest\", \r\n    \"zip\": \"1138\", \r\n    \"street\": \"Reitter Ferenc utca\", \r\n    \"houseNumber\": \"35\", \r\n    \"latitude\": 47.55498, \r\n    \"longitude\": 19.0389 \r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -68,19 +46,32 @@
       "response": []
     },
     {
-      "name": "Address getById",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
+      "name": "GetAll Addresses",
       "request": {
         "method": "GET",
         "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"country\": \"HU\",\r\n  \"zip\": \"1111\",\r\n  \"city\": \"Budapest\",\r\n  \"street\": \"Bartók Béla út\",\r\n  \"houseNumber\": \"1\"\r\n}"
-        },
         "url": {
-          "raw": "http://localhost:8080/api/addresses/1",
+          "raw": "http://localhost:8080/api/addresses",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "addresses"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetById Address",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/addresses/2",
           "protocol": "http",
           "host": [
             "localhost"
@@ -89,20 +80,20 @@
           "path": [
             "api",
             "addresses",
-            "1"
+            "2"
           ]
         }
       },
       "response": []
     },
     {
-      "name": "Address Update",
+      "name": "Update Address",
       "request": {
         "method": "PUT",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"country\": \"HU\",\r\n    \"zip\": \"2120\",\r\n    \"city\": \"Dunakeszi\",\r\n    \"street\": \"Bartók Béla út\",\r\n    \"houseNumber\": \"1\",\r\n    \"id\": 1\r\n}",
+          "raw": "{\r\n  \"country\": \"HU\",\r\n  \"zip\": \"1041\",\r\n  \"city\": \"Budapest\",\r\n  \"street\": \"Fo utca\",\r\n  \"houseNumber\": \"1\",\r\n  \"latitude\": 47.567,\r\n  \"longitude\": 19.12\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -126,12 +117,12 @@
       "response": []
     },
     {
-      "name": "Address Delete",
+      "name": "Delete Address",
       "request": {
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/addresses/1",
+          "raw": "http://localhost:8080/api/addresses/7",
           "protocol": "http",
           "host": [
             "localhost"
@@ -140,22 +131,79 @@
           "path": [
             "api",
             "addresses",
-            "1"
+            "7"
           ]
         }
       },
       "response": []
     },
     {
-      "name": "Exception Tests",
+      "name": "Post Addresses search",
       "request": {
-        "method": "GET",
-        "header": []
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \r\n    \"country\": \"Hungary\",\r\n    \"zip\": \"1138\",\r\n    \"city\": \"Bud\",\r\n    \"street\": \"Reit\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/addresses/search?page=0",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "addresses",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            }
+          ]
+        }
       },
       "response": []
     },
     {
-      "name": "Search Pageable /Specifications",
+      "name": "Post Milestone",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"plannedTime\": \"2026-02-23T13:30:00\",\r\n  \"addressId\": 2\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/milestones",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "milestones"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get AllMilestone",
       "protocolProfileBehavior": {
         "disableBodyPruning": true
       },
@@ -164,10 +212,341 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"country\": \"HU\",\r\n  \"zip\": \"1111\",\r\n  \"city\": \"Budapest\",\r\n  \"street\": \"Bartók Béla út\",\r\n  \"houseNumber\": \"1\"\r\n}"
+          "raw": ""
         },
         "url": {
-          "raw": "http://localhost:8080/api/addresses?page=0&size=2&sort=city,asc",
+          "raw": "http://localhost:8080/api/milestones",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "milestones"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Post TransportPlan",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"plannedStart\": \"2026-02-23T10:00:00\",\r\n  \"plannedEnd\": \"2026-02-23T12:00:00\",\r\n  \"expectedRevenue\": 100000,\r\n  \"stops\": [],\r\n  \"sections\": []\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transportplans",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transportplans"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetAll TransportPlan",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/transportplans",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transportplans"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetById TransportPlan",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/transportplans/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transportplans",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update TransportPlan",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"plannedStart\": \"2026-02-23T10:00:00\",\r\n  \"plannedEnd\": \"2026-02-23T12:00:00\",\r\n  \"expectedRevenue\": 100000,\r\n  \"stops\": [],\r\n  \"sections\": [\r\n    {\r\n      \"sectionOrder\": 0,\r\n      \"transportPlanId\": 1,\r\n      \"fromMilestoneId\": 1,\r\n      \"toMilestoneId\": 2\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transportplans/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transportplans",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delay tests 200 OK",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0cmFuc3BvcnRtZ3IiLCJhdXRoIjpbIlRSQU5TUE9SVF9NQU5BR0VSIl0sImlhdCI6MTc3MTg5MTM2NCwiZXhwIjoxNzcxODkxOTY0LCJpc3MiOiJ0cmFuc3BvcnQifQ.UwkvBKnmEoqcMCQab7-fe-4q-ZZdsB6TYx8Lew0EfDg",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"milestoneId\": 1,\r\n  \"minutes\": 30\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transportplans/1/delay",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transportplans",
+            "1",
+            "delay"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delay tests 400 without minutes",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"milestoneId\": 1 }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transportplans/1/delay",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transportplans",
+            "1",
+            "delay"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delay tests 400 without milestone",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"minutes\": 30 }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transportplans/1/delay",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transportplans",
+            "1",
+            "delay"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delay tests 400 body minutes 0",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"milestoneId\": 1, \"minutes\": 0 }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transportplans/1/delay",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transportplans",
+            "1",
+            "delay"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ADDRESS_MANAGER Login test",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"username\": \"addressmgr\", \"password\": \"pass123\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TRANSPORT_MANAGER Login test",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"username\":\"transportmgr\", \"password\":\"pass123\" }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Address with Token (A_M)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZGRyZXNzbWdyIiwiYXV0aCI6WyJBRERSRVNTX01BTkFHRVIiXSwiaWF0IjoxNzcxODY4NjQ4LCJleHAiOjE3NzE4NjkyNDgsImlzcyI6InRyYW5zcG9ydCJ9.PJsz6KpZig_Q2X8AlHW9Rxg7Koh8Ag167CNXhEidBZA",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"country\": \"HU\",\r\n  \"zip\": \"1041\",\r\n  \"city\": \"Budapest\",\r\n  \"street\": \"Fo utca\",\r\n  \"houseNumber\": \"1\",\r\n  \"latitude\": 47.567,\r\n  \"longitude\": 19.12\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/addresses",
           "protocol": "http",
           "host": [
             "localhost"
@@ -176,41 +555,70 @@
           "path": [
             "api",
             "addresses"
-          ],
-          "query": [
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delay with addressmgr token - Forbidden",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
             {
-              "key": "page",
-              "value": "0"
-            },
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZGRyZXNzbWdyIiwiYXV0aCI6WyJBRERSRVNTX01BTkFHRVIiXSwiaWF0IjoxNzcxODcwMjc3LCJleHAiOjE3NzE4NzA4NzcsImlzcyI6InRyYW5zcG9ydCJ9.ZP7VXXev6KtYv1K6SwlfTV15cii19vkTx220XX__nv8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"milestoneId\": 1, \"minutes\": 120 }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/transportplans/1/delay",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "transportplans",
+            "1",
+            "delay"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delay with transportmgr token - Permitted",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
             {
-              "key": "size",
-              "value": "2"
-            },
-            {
-              "key": "sort",
-              "value": "city,asc"
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0cmFuc3BvcnRtZ3IiLCJhdXRoIjpbIlRSQU5TUE9SVF9NQU5BR0VSIl0sImlhdCI6MTc3MTg2OTgzNywiZXhwIjoxNzcxODcwNDM3LCJpc3MiOiJ0cmFuc3BvcnQifQ.92l2ERIZm5cF_7NvjDTlrGneaWe9TmPwR6ceCZAi7Rk",
+              "type": "string"
             }
           ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Search Pageable /Specifications 2",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
-    },
-    {
-      "name": "TransportPlans GetAll",
-      "request": {
+        },
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{ \r\n    \"plannedStart\": \"2026-02-11T10:00:00\",\r\n    \"plannedEnd\": \"2026-02-11T18:00:00\",\r\n    \"expectedRevenue\": 100000, \r\n    \"stops\": \r\n    [ \r\n        {\r\n            \"stopOrder\": 1, \r\n            \"plannedArrival\": \"2026-02-11T10:30:00\",\r\n            \"plannedDeparture\": \"2026-02-11T11:00:00\",\r\n            \"addressId\": 1 \r\n        } \r\n    ] \r\n}",
+          "raw": "{ \"milestoneId\": 1, \"minutes\": 60 }",
           "options": {
             "raw": {
               "language": "json"
@@ -218,7 +626,7 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/api/transport-plans",
+          "raw": "http://localhost:8080/api/transportplans/1/delay",
           "protocol": "http",
           "host": [
             "localhost"
@@ -226,94 +634,9 @@
           "port": "8080",
           "path": [
             "api",
-            "transport-plans"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "TransportPlans Create 404",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"plannedStart\": \"2026-02-11T10:00:00\",\r\n  \"plannedEnd\": \"2026-02-11T18:00:00\",\r\n  \"expectedRevenue\": 100000,\r\n  \"stops\": [\r\n    {\r\n      \"stopOrder\": 1,\r\n      \"plannedArrival\": \"2026-02-11T10:30:00\",\r\n      \"plannedDeparture\": \"2026-02-11T11:00:00\",\r\n      \"addressId\": 2\r\n    }\r\n  ]\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8080/api/transport-plans",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "transport-plans"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "TransportPlans Create 400",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"plannedStart\": \"2026-02-11T10:00:00\",\r\n  \"plannedEnd\": \"2026-02-11T18:00:00\",\r\n  \"expectedRevenue\": 100000,\r\n  \"stops\": [\r\n    {\r\n      \"stopOrder\": 1,\r\n      \"plannedArrival\": \"2026-02-11T10:30:00\",\r\n      \"plannedDeparture\": \"2026-02-11T11:00:00\"\r\n    }\r\n  ]\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8080/api/transport-plans",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "transport-plans"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "TransportPlans Create 201 Created",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{ \r\n    \"plannedStart\": \"2026-02-11T10:00:00\",\r\n    \"plannedEnd\": \"2026-02-11T18:00:00\",\r\n    \"expectedRevenue\": 100000, \r\n    \"stops\": \r\n    [ \r\n        {\r\n            \"stopOrder\": 1, \r\n            \"plannedArrival\": \"2026-02-11T10:30:00\",\r\n            \"plannedDeparture\": \"2026-02-11T11:00:00\",\r\n            \"addressId\": 1 \r\n        } \r\n    ] \r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8080/api/transport-plans",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "transport-plans"
+            "transportplans",
+            "1",
+            "delay"
           ]
         }
       },
