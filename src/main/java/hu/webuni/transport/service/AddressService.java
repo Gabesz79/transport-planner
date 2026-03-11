@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -56,8 +57,11 @@ public class AddressService {
 	}
 	
 	@Transactional
-	public void deleteById(Long id) {
-		addressRepository.deleteById(id);
+	public void deleteByIdIfExists(Long id) {
+		//Ha nem megy be a feltételbe, akkor is lefut sikeresen a Controller miatt: return ResponseEntity.ok().build();
+		if (addressRepository.existsById(id)) {
+			addressRepository.deleteById(id);
+		}
 	}
 	
 //	public Page<Address> findAll(Specification<Address> spec, Pageable pageable) {

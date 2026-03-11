@@ -8,6 +8,7 @@ import org.h2.table.Plan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -37,6 +38,7 @@ public class TransportPlanService {
 	@Autowired
 	MilestoneRepository milestoneRepository;
 	
+	//Csak a nem lépcsőzetes delayhez használtam:
 	private Integer revenueReductionPercent = 30;
 	
 	private final TransportPlanRepository transportPlanRepository;
@@ -101,12 +103,49 @@ public class TransportPlanService {
 				stop.setTransportPlan(plan);
 			}
 		}
+		
+		//Sections kezelése:
+		if (plan.getSections() != null) {
+			for (Section section : plan.getSections()) {
+				
+				//Hibakezelések:
+				Long fromId = (section.getFromMilestone() == null) ? null : section.getFromMilestone().getId();
+				Long toId = (section.getToMilestone() == null) ? null : section.getToMilestone().getId();
+				
+				if (fromId == null || toId == null) {
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Section fromMilestoneId / toMilestoneId is required");
+				}
+				
+				if (!milestoneRepository.existsById(fromId)) {
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Milestone not found: " + fromId);
+				}
+				
+				if (!milestoneRepository.existsById(toId)) {
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Milestone not found: " + toId);
+				}
+				
+				section.setFromMilestone(milestoneRepository.getReferenceById(fromId));
+				section.setToMilestone(milestoneRepository.getReferenceById(toId));
+				
+				section.setTransportPlan(plan);
+			}
+		}
+		
+		
+		
 		//és elmentjük a tervet:
 		//Utánanéztem: a plan save esetén csak a tranzakció végén szúrja be 
 		//a TransportStop gyerek rekordot, ezért a transportPlan azonnali Dto-zásával
 		//a stops listák stop id-ja még null, ezt megoldja TransportPlan stops mezőjénél: 
 		//", cascade = CascadeType.ALL" és a saveAndFlush
-		return transportPlanRepository.saveAndFlush(plan);
+		TransportPlan savedPlan = transportPlanRepository.saveAndFlush(plan);
+		
+		//Lazy probléma miatt inicializálás:
+		savedPlan.getStops().size();
+		savedPlan.getSections().size();
+		
+		return savedPlan;
+		
 	}
 	
 	@Transactional
@@ -152,17 +191,26 @@ public class TransportPlanService {
 	@Transactional
 	public TransportPlan delay(Long planId, Long milestoneId, Integer minutes) {
 		
-		if (minutes <= 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minutes must be positive");
-		}
-		
-		//2 hibakeresés:
+		//Hibakezelések:
 		//létezik-e a transportPlan id alapján az objektum:
 		TransportPlan plan = transportPlanRepository.findById(planId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TransportPlan not found: " + planId));
+		
+		if (milestoneId == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "MilestonId is required");
+		}
+		
 		//létezik-e a milestone id alapján az objektum:
 		Milestone milestone = milestoneRepository.findById(milestoneId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Milestone not found: " + milestoneId));
+		
+		if (minutes == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minutes is required");
+		}
+		
+		if (minutes <= 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Minutes must be positive");
+		}
 		
 		//Ellenőrzöm, hogy adott TarnsportPlan section-einek Milestone része-e: 
 		//beteszem egy listába a transportPlan összes section-jét):

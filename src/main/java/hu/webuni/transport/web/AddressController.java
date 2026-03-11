@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,9 +42,7 @@ public class AddressController {
 	
 	@GetMapping
 	public List<AddressDto> getAll() {
-		return addressService.findAll().stream()
-				.map(addressMapper::addressToDto)
-				.toList();
+		return addressMapper.addressesToDtos(addressService.findAll());
 	}
 	
 //	@GetMapping
@@ -58,25 +57,75 @@ public class AddressController {
 //				.toList();
 //	}
 	
+	@GetMapping("/{id}")
+	public AddressDto getById(@PathVariable Long id) {
+		return addressMapper.addressToDto(addressService.findById(id));
+	}
+	
+	@PostMapping
+	public ResponseEntity<AddressDto> create(@RequestBody @Valid AddressDto dto) {
+		//Ha "id" ki van töltve -> 400-as hiba
+		if (dto.getId() != null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id must be null on create");
+		}
+		
+		Address saved = addressService.save(addressMapper.dtoToAddress(dto));
+		return ResponseEntity.ok(addressMapper.addressToDto(saved)); //200 OK
+	}
+	
+	@PutMapping("/{id}")
+	public AddressDto update(@PathVariable Long id, @RequestBody @Valid AddressDto dto) {
+		//Ha a body id-ja ki van töltve és eltér a path id-tól -> 400-as hiba
+		if (dto.getId() != null && !dto.getId().equals(id)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Body id differs from path id");
+		}
+		
+		addressService.findById(id); //404 Not Found ellenőrzése
+		
+		Address address = addressMapper.dtoToAddress(dto);
+		address.setId(id);
+		Address saved = addressService.save(address);
+		return addressMapper.addressToDto(saved); //ha oké, akkor 200-at ad vissza
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> delete(@PathVariable Long id) {
+		//A kérés szerint akkor is sikerül a törlés, ha nem volt ilyen id:
+		addressService.deleteByIdIfExists(id); //404 Not Found ellenőrzése
+		
+		//Ha nem megy be a feltételbe, akkor is lefut sikeresen a Controller miatt: return ResponseEntity.ok().build();
+		return ResponseEntity.ok().build();
+	}
+	
 	@PostMapping("/search")
-	public ResponseEntity<List<AddressDto>> search(@RequestBody AddressFilterDto filter,@RequestParam(required = false) Integer size, Pageable pageable) {
+	public ResponseEntity<List<AddressDto>> search(@RequestBody AddressFilterDto filter, @RequestParam(required = false) Integer size, Pageable pageable) {
+		
+		//"  " - Üresstring space-ekkel esetet is vizsgálja:
+		String country = (StringUtils.hasText(filter.getCountry())) ? filter.getCountry().trim() : null;
+		String city = (StringUtils.hasText(filter.getCity())) ? filter.getCity().trim() : null;
+		String zip = (StringUtils.hasText(filter.getZip())) ? filter.getZip().trim() : null;
+		String street = (StringUtils.hasText(filter.getStreet())) ? filter.getStreet().trim() : null;
 		
 		//Request body üres esetén (nincs egyáltalán filter mező), akkor 400-as hiba:
-		if (filter == null || (filter.getCountry() == null && filter.getCity() == null && filter.getZip() == null && filter.getStreet() == null)) {
+		if (filter == null || (country == null && city == null && zip == null && street == null)) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Empty filter body is not allowed");
 		}
 		
+		//Ha nincs megadva size, akkor page legyen 0:
+		int effectivePage = (size == null) ? 0 : pageable.getPageNumber();
+		
 		//Ha nincs megadva size, akkor minden találat egy oldalon (MAX_VALUE):
-		int effectiveSize = (size == null) ? Integer.MAX_VALUE : pageable.getPageSize();
+		int effectiveSize = (size == null) ? Integer.MAX_VALUE : size;
 
 		//Default rendezés (ha nincs sort, akkor id asc):
 		Sort effectiveSort = pageable.getSort().isSorted() ? pageable.getSort() : Sort.by("id").ascending();
 				
 		//Felülírom a size-ot és a defaultSort-t:
-		Pageable effectivePageable = PageRequest.of(pageable.getPageNumber(), effectiveSize, effectiveSort); 
+		int effectivePageNumber = (size == null) ? 0 : pageable.getPageNumber();
+		Pageable effectivePageable = PageRequest.of(effectivePageNumber, effectiveSize, effectiveSort); 
 
 		//filter body-ban jön be, és pageable:
-		Page<Address> page = addressService.search(filter.getCity(), filter.getZip(), filter.getStreet(), filter.getCountry(), effectivePageable);
+		Page<Address> page = addressService.search(city, zip, street, country, effectivePageable);
 		
 		//Így is meg lehet oldani:
 //		List<AddressDto> dtos = page.getContent().stream()
@@ -93,35 +142,7 @@ public class AddressController {
 				.body(dtos);
 	}
 	
-	@GetMapping("/{id}")
-	public AddressDto getById(@PathVariable Long id) {
-		return addressMapper.addressToDto(addressService.findById(id));
-	}
 	
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED) //új példány létrejötte, ha oké, akkor 201-at ad vissza
-	public AddressDto create(@RequestBody @Valid AddressDto dto) {
-		Address saved = addressService.save(addressMapper.dtoToAddress(dto));
-		return addressMapper.addressToDto(saved);
-	}
-	
-	@PutMapping("/{id}")
-	public AddressDto update(@PathVariable Long id, @RequestBody @Valid AddressDto dto) {
-		addressService.findById(id); //404 Not Found ellenőrzése
-		
-		Address address = addressMapper.dtoToAddress(dto);
-		address.setId(id);
-		Address saved = addressService.save(address);
-		return addressMapper.addressToDto(saved); //ha oké, akkor 200-at ad vissza
-	}
-	
-	@DeleteMapping("/{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT) //Sikeres törlésnél: 204 - nincs body válasz
-	public void delete(@PathVariable Long id) {
-		addressService.findById(id); //404 Not Found ellenőrzése
-		
-		addressService.deleteById(id);
-	}
 	
 	
 	
